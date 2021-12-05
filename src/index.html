@@ -12,14 +12,24 @@
 <body>
   <img id="image" src="./img/placeholder.jpg" height="300" width="300">
 
-  <h2 id="title"></h2>
+  <h2 style="margin:0;padding:0;" id="title"></h2>
 
   <p id="info"></p>
 
-  <button style="display:inline-block;margin-right:5px;" type="button" class="btn" id="selectFile">Select file</button>
-  <div style="display:inline-block;margin-right:5px;" id="btn-audio"></div>
+  <div id="audio-progress-bar" style="align-items:center;"></div>
+
+  <div id="audio-buttons" class="bottom">
+    <div class="inline-block" id="btn-selectfile"></div>
+    <div class="inline-block" id="btn-backward"></div>
+    <div class="inline-block" id="btn-audio"></div>
+    <div class="inline-block" id="btn-forward"></div>
+    <div class="inline-block" id="btn-audio-repeat"></div>
+    <div class="inline-block" id="btn-audio-volume"></div>
+  </div>
 
   <script src="./js/script.js"></script>
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 </body>
 
 </html>

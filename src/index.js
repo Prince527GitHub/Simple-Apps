@@ -21,7 +21,7 @@ const createWindow = () => {
     autoHideMenuBar: true,
     resizable: false,
     fullscreenable: false,
-    minimizable: false,
+    minimizable: true,
     maximizable: false,
   });
 
@@ -50,6 +50,9 @@ const createWindow = () => {
       mainWindow.show();
     }
   });
+
+  // dev tools
+  // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
