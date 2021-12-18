@@ -5,7 +5,7 @@
 
 A very simple program to search for anime.
 
-![anime](https://github.com/Prince527GitHub/Simple-Apps/blob/zips/Images%20for%20README/anime_EDoAj5mahV.jpg?raw=true)
+<img src="https://github.com/Prince527GitHub/Simple-Apps/blob/zips/Images%20for%20README/anime_EDoAj5mahV.jpg?raw=true" width="384" height="216">
 
 ## Downloader
 
