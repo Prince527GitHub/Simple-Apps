@@ -1,15 +1,4 @@
-const updateOnlineStatus = () => {
-    return navigator.onLine ? 'online' : 'offline';
-}
-
-window.addEventListener('online', updateOnlineStatus);
-window.addEventListener('offline', updateOnlineStatus);
-
-if (updateOnlineStatus() === "online") {
-    document.getElementById('btn-selectfile').innerHTML = `<ion-icon name="document-outline" class="icons inline-block" id="selectFile"></ion-icon>`;
-} else {
-    document.getElementById('btn-selectfile').innerHTML = `<button type="button" class="btn" id="selectFile">File</button>`
-}
+document.getElementById('btn-selectfile').innerHTML = `<i class="icons inline-block bi bi-file-earmark-music" id="selectFile"></i>`;
 
 const {
     remote
@@ -50,26 +39,21 @@ selectFile.onclick = async () => {
     }
 
     try {
-        audio = new Audio(file.filePaths[0]);
+        img.src = "./img/placeholder.jpg";
+        title.innerHTML = "";
+        info.innerHTML = "";
+        audio = new Audio(file.filePaths[0].replace(/#/g, '%23'));
         audio.play();
-        if (updateOnlineStatus() === "online") {
-            btnGroup.innerHTML = `<button class="rounded-button" type="button" onclick="audioControl()"><ion-icon name="pause" size="large"></ion-icon></button>`;
-            btnGroupRepeat.innerHTML = `<ion-icon name="repeat" class="icons" onclick="repeat()"></ion-icon>`;
-            rewind.innerHTML = `<ion-icon name="play-back-outline" onclick="backward()" class="icons" style="width:35px;height:35px;"></ion-icon>`;
-            fastForward.innerHTML = `<ion-icon name="play-forward-outline" onclick="forward()" class="icons" style="width:35px;height:35px;"></ion-icon>`;
-            volumeBar.innerHTML = `<div class="btn-group dropup bottom-right"><ion-icon name="volume-high" class="icons" data-bs-toggle="dropdown" aria-expanded="false"></ion-icon><ul class="dropdown-menu"><div style="color:#ffffff00;">dasdasdkprgoregpokperkgp2345r</div><div class="container"><input id="vol-control" type="range" min="0" max="100" step="1" value="${volume}" oninput="SetVolume(this.value)" onchange="SetVolume(this.value)"></input><div id="slider-value">100</div></div></ul></div>`;
-        } else {
-            btnGroup.innerHTML = `<button type="button" class="btn" onclick="audioControl()">Pause</button>`;
-            btnGroupRepeat.innerHTML = `<button type="button" class="btn" onclick="repeat()">Repeat</button>`;
-            rewind.innerHTML = `<button type="button" class="btn" onclick="backward()">-10</button>`;
-            fastForward.innerHTML = `<button type="button" class="btn" onclick="forward()">+10</button>`;
-            volumeBar.innerHTML = `<div class="btn-group dropup bottom-right"><button type="button" class="btn" data-bs-toggle="dropdown" aria-expanded="false">Vol</button><ul class="dropdown-menu"><div style="color:#ffffff00;">dasdasdkprgoregpokperkgp2345r</div><div class="container"><input id="vol-control" type="range" min="0" max="100" step="1" value="${volume}" oninput="SetVolume(this.value)" onchange="SetVolume(this.value)"></input><div id="slider-value">100</div></div></ul></div>`;
-        }
+        btnGroup.innerHTML = `<button class="rounded-button" type="button" onclick="audioControl()"><i size="large" class="bi bi-pause"></i></button>`;
+        btnGroupRepeat.innerHTML = `<i class="icons bi bi-arrow-repeat" onclick="repeat()"></i>`;
+        rewind.innerHTML = `<i onclick="backward()" class="icons bi bi-skip-backward" style="width:35px;height:35px;"></i>`;
+        fastForward.innerHTML = `<i onclick="forward()" class="icons bi bi-skip-forward" style="width:35px;height:35px;"></i>`;
+        volumeBar.innerHTML = `<div class="btn-group dropup bottom-right"><i class="icons bi bi-volume-up" data-bs-toggle="dropdown" aria-expanded="false"></i><ul class="dropdown-menu"><div style="color:#ffffff00;">dasdasdkprgoregpokperkgp2345r</div><div class="container"><input id="vol-control" type="range" min="0" max="100" step="1" value="${volume}" oninput="SetVolume(this.value)" onchange="SetVolume(this.value)"></input><div id="slider-value">100</div></div></ul></div>`;
         progressBarDiv.innerHTML = `<fieldset><label id="audio-progress-bar-start" for="audio-progress-control" style="display: inline-block;">0%</label><input style="display: inline-block;" id="audio-progress-control" name="audio-progress-control" type="range" min="0" max="100" value="100" readonly></label><span id="audio-progress-bar-end" for="audio-progress-control" style="display: inline-block;">100%</label></fieldset>`;
         SetVolume(volume);
         progress();
     } catch (err) {
-        console.log(err);
+        alart("An error has occurred while trying to play the audio.");
     }
 
     audio.onended = () => {
@@ -90,56 +74,38 @@ selectFile.onclick = async () => {
             if (image) {
                 const base64String = Buffer.from(image.data, 'binary').toString('base64');
                 img.src = `data:${image.format};base64,${base64String}`;
-            }
+            } else img.src = "./img/undefined.jpg";
 
             title.innerHTML = tag.tags.title;
             info.innerHTML = tag.tags.artist;
         },
         onError: (error) => {
-            console.log(error);
+            img.src = "./img/undefined.jpg";
+            title.innerHTML = "undefined";
+            info.innerHTML = "undefined";
         },
     });
 };
 
 async function audioControl() {
     if (audio === null) return;
-    if (updateOnlineStatus() === "online") {
-        if (audio.paused) {
-            audio.play();
-            btnGroup.innerHTML = `<button class="rounded-button" type="button" onclick="audioControl()"><ion-icon name="pause" size="large"></ion-icon></button>`;
-        } else {
-            audio.pause();
-            btnGroup.innerHTML = `<button class="rounded-button" type="button" onclick="audioControl()"><ion-icon name="play" size="large"></ion-icon></button>`;
-        }
+    if (audio.paused) {
+        audio.play();
+        btnGroup.innerHTML = `<button class="rounded-button" type="button" onclick="audioControl()"><i class="bi bi-pause" size="large"></i></button>`;
     } else {
-        if (audio.paused) {
-            audio.play();
-            btnGroup.innerHTML = `<button type="button" class="btn" onclick="audioControl()">Pause</button>`;
-        } else {
-            audio.pause();
-            btnGroup.innerHTML = `<button type="button" class="btn" onclick="audioControl()">Play</button>`;
-        }
+        audio.pause();
+        btnGroup.innerHTML = `<button class="rounded-button" type="button" onclick="audioControl()"><i class="bi bi-play" size="large"></i></button>`;
     }
 }
 
 async function repeat() {
     if (audio === null) return;
-    if (updateOnlineStatus() === "online") {
-        if (audio.loop) {
-            audio.loop = false;
-            btnGroupRepeat.innerHTML = `<ion-icon name="repeat" class="icons onclick="repeat()"></ion-icon>`;
-        } else {
-            audio.loop = true;
-            btnGroupRepeat.innerHTML = `<ion-icon name="infinite-outline" class="icons onclick="repeat()"></ion-icon>`;
-        }
+    if (audio.loop) {
+        audio.loop = false;
+        btnGroupRepeat.innerHTML = `<i class="icons bi bi-arrow-repeat" onclick="repeat()"></i>`;
     } else {
-        if (audio.loop) {
-            audio.loop = false;
-            btnGroupRepeat.innerHTML = `<button type="button" class="btn" onclick="repeat()">Repeat</button>`;
-        } else {
-            audio.loop = true;
-            btnGroupRepeat.innerHTML = `<button type="button" class="btn" onclick="repeat()">Repeating</button>`;
-        }
+        audio.loop = true;
+        btnGroupRepeat.innerHTML = `<i class="icons bi bi-infinity" onclick="repeat()"></i>`;
     }
 }
 
