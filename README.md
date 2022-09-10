@@ -17,4 +17,4 @@ A very simple program to download files.
 
 A very simple music player.
 
-![music](https://github.com/Prince527GitHub/Simple-Apps/blob/zips/Images%20for%20README/music_dHkn0SOjQS.png?raw=true)
+![music](https://raw.githubusercontent.com/Prince527GitHub/Simple-Apps/zips/Images%20for%20README/music-player-4.0.png)
