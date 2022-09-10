@@ -1,31 +1,45 @@
-document.getElementById('btn-selectfile').innerHTML = `<i class="icons inline-block bi bi-file-earmark-music" id="selectFile"></i>`;
-
-const {
-    remote
-} = require('electron');
+const { remote } = require('electron');
 const dialog = remote.dialog;
 const mainWindow = remote.getCurrentWindow();
 
 const jsmediatags = require('jsmediatags');
 
-const selectFile = document.getElementById('selectFile');
 const info = document.getElementById('info');
 const title = document.getElementById('title');
 const img = document.getElementById('image');
-const btnGroup = document.getElementById('btn-audio');
-const btnGroupRepeat = document.getElementById('btn-audio-repeat');
-const fastForward = document.getElementById('btn-forward');
-const rewind = document.getElementById('btn-backward');
-const volumeBar = document.getElementById('btn-audio-volume');
-const progressBarDiv = document.getElementById('audio-progress-bar');
+const btnControl = document.getElementById('btn-control');
+const btnRepeat = document.getElementById('btn-repeat');
+const btnForward = document.getElementById('btn-forward');
+const btnRewind = document.getElementById('btn-backward');
+const btnVolume = document.getElementById('volume-dropdown');
+const volumeInner = document.getElementById('volume-inner-dropdown');
+const audioPercent = document.getElementById('audio-progress');
+const btnTheme = document.getElementById('btn-theme');
+const volumeSlider = document.getElementById("volume-control");
+const root = document.documentElement;
+
+if (!localStorage.getItem('theme')) localStorage.setItem('theme', 'dark');
+
+if (localStorage.getItem('theme') === "dark") {
+    btnTheme.classList.add("bi-moon");
+    root.style.setProperty("--bg-color", "#1A1818");
+    root.style.setProperty("--text-color", "#ffffff");
+    volumeInner.classList.add("dark");
+    color = '#fff';
+    colorClass = 'dark';
+} else {
+    btnTheme.classList.add("bi-sun");
+    root.style.setProperty("--bg-color", "#ffffff");
+    root.style.setProperty("--text-color", "#000000");
+}
 
 let audio = null;
 let volume = 100;
 
-selectFile.onclick = async () => {
+async function audioLoad() {
     const file = await dialog.showOpenDialog(mainWindow, {
         filters: [{
-            name: "Audio Files",
+            name: "Audio File",
             extensions: ["mp3", "wav", "ogg", "acc"]
         }],
         properties: ["openFile"]
@@ -39,33 +53,35 @@ selectFile.onclick = async () => {
     }
 
     try {
-        img.src = "./img/placeholder.jpg";
+        img.classList.remove("hidden");
         title.innerHTML = "";
         info.innerHTML = "";
         audio = new Audio(file.filePaths[0].replace(/#/g, '%23'));
         audio.play();
-        btnGroup.innerHTML = `<button class="rounded-button" type="button" onclick="audioControl()"><i size="large" class="bi bi-pause"></i></button>`;
-        btnGroupRepeat.innerHTML = `<i class="icons bi bi-arrow-repeat" onclick="repeat()"></i>`;
-        rewind.innerHTML = `<i onclick="backward()" class="icons bi bi-skip-backward" style="width:35px;height:35px;"></i>`;
-        fastForward.innerHTML = `<i onclick="forward()" class="icons bi bi-skip-forward" style="width:35px;height:35px;"></i>`;
-        volumeBar.innerHTML = `<div class="btn-group dropup bottom-right"><i class="icons bi bi-volume-up" data-bs-toggle="dropdown" aria-expanded="false"></i><ul class="dropdown-menu"><div style="color:#ffffff00;">dasdasdkprgoregpokperkgp2345r</div><div class="container"><input id="vol-control" type="range" min="0" max="100" step="1" value="${volume}" oninput="SetVolume(this.value)" onchange="SetVolume(this.value)"></input><div id="slider-value">100</div></div></ul></div>`;
-        progressBarDiv.innerHTML = `<fieldset><label id="audio-progress-bar-start" for="audio-progress-control" style="display: inline-block;">0%</label><input style="display: inline-block;" id="audio-progress-control" name="audio-progress-control" type="range" min="0" max="100" value="100" readonly></label><span id="audio-progress-bar-end" for="audio-progress-control" style="display: inline-block;">100%</label></fieldset>`;
-        SetVolume(volume);
-        progress();
+        btnControl.classList.remove("hidden");
+        btnRepeat.classList.remove("hidden");
+        btnRewind.classList.remove("hidden");
+        btnForward.classList.remove("hidden");
+        btnVolume.classList.remove("hidden");
+        audioPercent.classList.remove("hidden");
+        volumeSlider.value = volume;
+        audioVolume(volume);
+        audioProgress();
     } catch (err) {
-        alart("An error has occurred while trying to play the audio.");
+        console.error(err);
+        alert("An error has occurred while trying to play the audio.");
     }
 
     audio.onended = () => {
-        img.src = "./img/placeholder.jpg";
+        img.classList.add("hidden");
         title.innerHTML = "";
         info.innerHTML = "";
-        btnGroup.innerHTML = "";
-        btnGroupRepeat.innerHTML = "";
-        rewind.innerHTML = "";
-        fastForward.innerHTML = "";
-        volumeBar.innerHTML = "";
-        progressBarDiv.innerHTML = "";
+        btnControl.classList.add("hidden");
+        btnRepeat.classList.add("hidden");
+        btnRewind.classList.add("hidden");
+        btnForward.classList.add("hidden");
+        btnVolume.classList.add("hidden");
+        audioPercent.classList.add("hidden");
     };
 
     jsmediatags.read(file.filePaths[0], {
@@ -74,13 +90,13 @@ selectFile.onclick = async () => {
             if (image) {
                 const base64String = Buffer.from(image.data, 'binary').toString('base64');
                 img.src = `data:${image.format};base64,${base64String}`;
-            } else img.src = "./img/undefined.jpg";
+            } else img.src = "./img/undefined.png";
 
             title.innerHTML = tag.tags.title;
             info.innerHTML = tag.tags.artist;
         },
         onError: (error) => {
-            img.src = "./img/undefined.jpg";
+            img.src = "./img/undefined.png";
             title.innerHTML = "undefined";
             info.innerHTML = "undefined";
         },
@@ -89,53 +105,87 @@ selectFile.onclick = async () => {
 
 async function audioControl() {
     if (audio === null) return;
+
+    const icon = document.getElementById("icon-control");
+
     if (audio.paused) {
         audio.play();
-        btnGroup.innerHTML = `<button class="rounded-button" type="button" onclick="audioControl()"><i class="bi bi-pause" size="large"></i></button>`;
+        icon.classList.remove("bi-play");
+        icon.classList.add("bi-pause");
     } else {
         audio.pause();
-        btnGroup.innerHTML = `<button class="rounded-button" type="button" onclick="audioControl()"><i class="bi bi-play" size="large"></i></button>`;
+        icon.classList.remove("bi-pause");
+        icon.classList.add("bi-play");
     }
 }
 
-async function repeat() {
+async function audioRepeat() {
     if (audio === null) return;
+
+    const icon = document.getElementById("icon-repeat");
+
     if (audio.loop) {
         audio.loop = false;
-        btnGroupRepeat.innerHTML = `<i class="icons bi bi-arrow-repeat" onclick="repeat()"></i>`;
+        icon.classList.remove("bi-infinity");
+        icon.classList.add("bi-arrow-repeat");
     } else {
         audio.loop = true;
-        btnGroupRepeat.innerHTML = `<i class="icons bi bi-infinity" onclick="repeat()"></i>`;
+        icon.classList.remove("bi-arrow-repeat");
+        icon.classList.add("bi-infinity");
     }
 }
 
-async function forward() {
+async function audioForward() {
     if (audio === null) return;
+
     audio.currentTime += 10;
 }
 
-async function backward() {
+async function audioBackward() {
     if (audio === null) return;
+
     audio.currentTime -= 10;
 }
 
-async function SetVolume(val) {
+async function audioVolume(val) {
     if (audio === null) return;
-    const volSlider = document.getElementById("vol-control");
-    const sliderValue = document.getElementById("slider-value");
+
+    const sliderValue = document.getElementById("volume-value");
+
     audio.volume = val / 100;
-    valPercent = (volSlider.value / volSlider.max)*100;
-    volSlider.style.background = `linear-gradient(to right, #3264fe ${valPercent}%, #d5d5d5 ${valPercent}%)`;
-    sliderValue.innerHTML = volSlider.value;
+    const valPercent = (volumeSlider.value / volumeSlider.max)*100;
+
+    volumeSlider.value = valPercent;
+    sliderValue.innerHTML = volumeSlider.value;
 }
 
-async function progress() {
+async function audioProgress() {
     if (audio === null) return;
-    const progressBar = document.getElementById('audio-progress-control');
+
+    const element = document.getElementById('audio-progress-control');
+
     audio.addEventListener('timeupdate', () => {
         const duration = audio.duration;
         const currentTime = audio.currentTime;
         const percent = (currentTime / duration) * 100;
-        progressBar.value = percent;
+        element.value = percent;
     });
+}
+
+async function theme() {
+    if (localStorage.getItem('theme') === "dark") {
+        btnTheme.classList.remove("bi-moon");
+        btnTheme.classList.add("bi-sun");
+        root.style.setProperty("--bg-color", "#ffffff");
+        root.style.setProperty("--text-color", "#000000");
+        volumeInner.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+    } else {
+        btnTheme.classList.remove("bi-sun");
+        btnTheme.classList.add("bi-moon");
+        root.style.setProperty("--bg-color", "#1A1818");
+        root.style.setProperty("--text-color", "#ffffff");
+        volumeInner.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+    }
 }

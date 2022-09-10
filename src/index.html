@@ -11,22 +11,59 @@
 </head>
 
 <body>
-  <img id="image" src="./img/placeholder.jpg" height="300" width="300">
+  <div id="volume-dropdown" class="dropdown top-left hidden">
+    <i class="bi bi-volume-up" data-bs-toggle="dropdown" aria-expanded="false"></i>
+    <ul id="volume-inner-dropdown" class="dropdown-menu">
+      <div class="container">
+        <input id="volume-control" class="slider-width" type="range" min="0" max="100" step="1" oninput="audioVolume(this.value)" onchange="audioVolume(this.value)">
+        <div id="volume-value" class="slider-value">100</div>
+      </div>
+    </ul>
+  </div>
 
-  <h2 style="margin:0;padding:0;" id="title"></h2>
+  <i onclick="theme()" class="bi top-right" id="btn-theme"></i>
+
+  <img id="image" class="circle hidden" src="" height="300" width="300">
+
+  <h2 class="title" id="title"></h2>
 
   <p id="info"></p>
 
-  <div id="audio-progress-bar" style="align-items:center;"></div>
+  <table class="hidden full-width" id="audio-progress">
+    <tr>
+      <td>
+        0%
+      </td>
+      <td>
+        <input class="full-width" id="audio-progress-control" type="range" min="0" max="100" value="100">
+      </td>
+      <td>
+        100%
+      </td>
+    </tr>
+  </table>
 
-  <div id="audio-buttons" class="bottom">
-    <div class="inline-block" id="btn-selectfile"></div>
-    <div class="inline-block" id="btn-backward"></div>
-    <div class="inline-block" id="btn-audio"></div>
-    <div class="inline-block" id="btn-forward"></div>
-    <div class="inline-block" id="btn-audio-repeat"></div>
-    <div class="inline-block" id="btn-audio-volume"></div>
-  </div>
+  <table class="bottom full-width">
+    <tr>
+      <td id="btn-selectfile">
+        <i onclick="audioLoad()" class="btn-other bi bi-file-earmark-music"></i>
+      </td>
+      <td class="hidden" id="btn-backward">
+        <i onclick="audioBackward()" class="btn-time bi bi-skip-backward"></i>
+      </td>
+      <td class="hidden" id="btn-control">
+        <button onclick="audioControl()" class="btn-control">
+          <i class="bi bi-pause" id="icon-control"></i>
+        </button>
+      </td>
+      <td class="hidden" id="btn-forward">
+        <i onclick="audioForward()" class="btn-time bi bi-skip-forward"></i>
+      </td>
+      <td class="hidden" id="btn-repeat">
+        <i onclick="audioRepeat()" class="btn-other bi bi-arrow-repeat" id="icon-repeat"></i>
+      </td>
+    </tr>
+  </table>
 
   <script src="./js/script.js"></script>
 </body>
